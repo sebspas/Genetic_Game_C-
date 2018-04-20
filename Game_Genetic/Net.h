@@ -2,8 +2,6 @@
 #include <vector>
 #include "Neuron.h"
 
-typedef std::vector<Neuron> Layer;
-
 class Net
 {
 public:
@@ -13,6 +11,7 @@ public:
 	void feed_forward(const std::vector<double> &inputs_values);
 	void back_prop(const std::vector<double> &targets_values);
 	void get_results(std::vector<double> &results_values) const;
+	double get_recent_average_error() const { return recent_average_error; };
 
 private:
 	double error;

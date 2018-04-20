@@ -1,6 +1,9 @@
 #pragma once
 #include <vector>
-#include "Net.h"
+
+class Neuron;
+
+typedef std::vector<Neuron> Layer;
 
 struct Connection
 {
@@ -10,6 +13,7 @@ struct Connection
 
 class Neuron
 {
+
 public:
 	explicit Neuron(unsigned nb_output, unsigned index);
 	~Neuron();
@@ -19,7 +23,7 @@ public:
 
 	void feed_forward(const Layer& prev_layer);
 	void calculate_output_gradient(const double targets_value);
-	double sum_oow(const Layer& next_layer) const;
+	double sum_oow(const Layer & next_layer) const;
 	void calculate_hidden_gradient(const Layer& next_layer);
 	void update_input_weight(Layer& prev_layer);
 
@@ -37,4 +41,3 @@ private:
 	static double transfer_function_derivative(const double x);
 
 };
-

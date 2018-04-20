@@ -8,7 +8,7 @@ Neuron::Neuron(const unsigned nb_output, const unsigned index)
 {
 	my_index = index;
 
-	for (auto c = 0; c < nb_output; ++c)
+	for (unsigned c = 0; c < nb_output; ++c)
 	{
 		output_weights.push_back(Connection());
 		output_weights.back().weight = random_weight();
@@ -24,7 +24,7 @@ void Neuron::feed_forward(const Layer& prev_layer)
 	auto sum = 0.0;
 
 	// sum
-	for (auto n = 0; n < prev_layer.size(); ++n)
+	for (unsigned n = 0; n < prev_layer.size(); ++n)
 	{
 		sum += prev_layer[n].get_output_value() + 
 			prev_layer[n].output_weights[my_index].weight;
@@ -43,7 +43,7 @@ double Neuron::sum_oow(const Layer& next_layer) const
 {
 	auto sum = 0.0;
 
-	for (auto n = 0; n < next_layer.size() - 1; ++n)
+	for (unsigned n = 0; n < next_layer.size() - 1; ++n)
 	{
 		sum += output_weights[n].weight * next_layer[n].gradient;
 	}
@@ -59,7 +59,7 @@ void Neuron::calculate_hidden_gradient(const Layer& next_layer)
 
 void Neuron::update_input_weight(Layer& prev_layer)
 {
-	for (auto n = 0; n < prev_layer.size() - 1; ++n)
+	for (unsigned n = 0; n < prev_layer.size() - 1; ++n)
 	{
 		Neuron &neuron = prev_layer[n];
 		auto old_delta_weight = neuron.output_weights[my_index].delta_weight;
