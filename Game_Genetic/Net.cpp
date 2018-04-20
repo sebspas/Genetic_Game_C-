@@ -3,6 +3,8 @@
 #include <iostream>
 #include <cassert>
 
+double Net::recent_average_smoothing_factor = 100.0; // Number of training samples to average over
+
 Net::Net(const std::vector<unsigned>& topology)
 {
 	const auto num_layers = topology.size();
@@ -19,10 +21,10 @@ Net::Net(const std::vector<unsigned>& topology)
 			layers.back().push_back(Neuron(nb_output, neuron_num));
 			std::cout << "Made a neuron !" << std::endl;
 		}
-	}
 
-	// set the biais neuron output value to 1.0
-	layers.back().back().set_output_value(1.0);
+		// set the biais neuron output value to 1.0
+		layers.back().back().set_output_value(1.0);
+	}
 }
 
 Net::~Net()
@@ -54,7 +56,7 @@ void Net::feed_forward(const std::vector<double>& inputs_values)
 void Net::back_prop(const std::vector<double>& targets_values)
 {
 	// Calculate overall net error
-	auto output_layer = layers.back();
+	Layer& output_layer = layers.back();
 	error = 0.0;
 
 	for (unsigned n = 0; n < output_layer.size() - 1; ++n)
@@ -79,10 +81,10 @@ void Net::back_prop(const std::vector<double>& targets_values)
 
 	// Calculate gradients on hidden layers
 
-	for (int layer_num = layers.size() - 2; layer_num > 0; --layer_num)
+	for (unsigned layer_num = layers.size() - 2; layer_num > 0; --layer_num)
 	{
-		auto hidden_layer = layers[layer_num];
-		auto next_layer = layers[layer_num + 1];
+		Layer& hidden_layer = layers[layer_num];
+		Layer& next_layer = layers[layer_num + 1];
 
 		for (unsigned n = 0; n < hidden_layer.size(); ++n)
 		{
@@ -91,10 +93,10 @@ void Net::back_prop(const std::vector<double>& targets_values)
 	}
 
 	// Update connection weight depending on the error
-	for (int layer_num = layers.size() - 1; layer_num > 0; --layer_num)
+	for (unsigned layer_num = layers.size() - 1; layer_num > 0; --layer_num)
 	{
-		auto layer = layers[layer_num];
-		auto prev_layer = layers[layer_num - 1];
+		Layer& layer = layers[layer_num];
+		Layer& prev_layer = layers[layer_num - 1];
 
 		for (unsigned n = 0; n < layer.size() - 1; ++n)
 		{

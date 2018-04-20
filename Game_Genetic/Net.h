@@ -16,7 +16,7 @@ public:
 private:
 	double error;
 	double recent_average_error;
-	double recent_average_smoothing_factor;
+	static double recent_average_smoothing_factor;
 	std::vector<Layer> layers{}; // layers[layer_num][neuron_num]
 };
 
