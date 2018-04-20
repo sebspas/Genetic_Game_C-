@@ -15,6 +15,9 @@ public:
 	void get_results(std::vector<double> &results_values) const;
 
 private:
+	double error;
+	double recent_average_error;
+	double recent_average_smoothing_factor;
 	std::vector<Layer> layers{}; // layers[layer_num][neuron_num]
 };
 
