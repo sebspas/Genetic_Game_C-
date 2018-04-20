@@ -91,7 +91,7 @@ void Net::back_prop(const std::vector<double>& targets_values)
 	}
 
 	// Update connection weight depending on the error
-	for (int layer_num = layers.size() - 1; layer_num >= 0; --layer_num)
+	for (int layer_num = layers.size() - 1; layer_num > 0; --layer_num)
 	{
 		auto layer = layers[layer_num];
 		auto prev_layer = layers[layer_num - 1];
