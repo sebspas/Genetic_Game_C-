@@ -8,10 +8,19 @@ using namespace Snake;
 
 Renderer::Renderer(int scale = 24, int wScale = 24)
 {
+	this->scale = scale;
+	this->wScale = wScale;
+
 	//Show the window with these settings and apply a renderer to it
 	//The renderer is responsible for all graphics being displayed
 	window = SDL_CreateWindow("Snake", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, scale*wScale, scale*wScale, SDL_WINDOW_RESIZABLE);
 	renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
+
+	// init the player rect
+	player_rect.x = 0;
+	player_rect.y = 0;
+	player_rect.h = 0;
+	player_rect.w = 0;
 }
 
 
@@ -20,24 +29,24 @@ Renderer::~Renderer()
 	SDL_DestroyWindow(window);
 }
 
-void Renderer::renderPlayer(SDL_Rect player, int x, int y, int scale, std::vector<int> tailX, std::vector<int> tailY, int tailLength) const
+void Renderer::renderPlayer(const PlayerSnake* player_snake)
 {
 	//Setting color before rendering, needs to be set first each time or the block could get a color from another block
 	SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
-	player.w = scale;
-	player.h = scale;
+	player_rect.w = scale;
+	player_rect.h = scale;
 
 	//Gets x and y of all tail blocks and renders them
-	for (int i = 0; i < tailLength; i++) {
-		player.x = tailX[i];
-		player.y = tailY[i];
-		SDL_RenderFillRect(renderer, &player);
+	for (int i = 0; i < player_snake->getTailLength(); i++) {
+		player_rect.x = player_snake->getTailXAt(i);
+		player_rect.y = player_snake->getTailYAt(i);
+		SDL_RenderFillRect(renderer, &player_rect);
 	}
 
-	player.x = x;
-	player.y = y;
+	player_rect.x = player_snake->getX();
+	player_rect.y = player_snake->getY();
 
-	SDL_RenderFillRect(renderer, &player);
+	SDL_RenderFillRect(renderer, &player_rect);
 }
 
 
@@ -47,7 +56,7 @@ void Renderer::renderFood(SDL_Rect food) const
 	SDL_RenderFillRect(renderer, &food);
 }
 
-void Renderer::renderScore(int tailLength, int scale, int wScale) const
+void Renderer::renderScore(int tailLength) const
 {
 	SDL_Color Black = { 0, 0, 0 };
 	//Get the font used for displaying text
@@ -71,7 +80,7 @@ void Renderer::renderScore(int tailLength, int scale, int wScale) const
 	TTF_CloseFont(font);
 }
 
-void Renderer::gameOver(SDL_Event event, int scale, int wScale, int tailLength) const {
+void Renderer::gameOver(SDL_Event event, int tailLength) const {
 	SDL_Color Red = { 255, 0, 0 };
 	SDL_Color White = { 255, 255, 255 };
 	SDL_Color Black = { 0, 0, 0 };

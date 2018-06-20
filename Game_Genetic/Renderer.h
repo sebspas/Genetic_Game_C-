@@ -1,6 +1,7 @@
 #pragma once
 #include <vector>
 #include <SDL.h>
+#include "PlayerSnake.h"
 
 namespace Snake
 {
@@ -9,14 +10,20 @@ namespace Snake
 		SDL_Renderer * renderer;
 		SDL_Window* window;
 
+		SDL_Rect player_rect;
+		int scale, wScale;
+
 	public:
-		Renderer(int scale, int wscale);
+		Renderer(int scale, int wScale);
 		~Renderer();
-		void renderPlayer(SDL_Rect player, int x, int y, int scale, std::vector<int> tailX, std::vector<int> tailY, int tailLength) const;
+		void renderPlayer(const PlayerSnake* player_snake);
 		void renderFood(SDL_Rect food) const;
-		void renderScore(int tailLength, int scale, int wScale) const;
-		void gameOver(SDL_Event event, int scale, int wScale, int tailLength) const;
+		void renderScore(int tailLength) const;
+		void gameOver(SDL_Event event, int tailLength) const;
 
 		void renderGame() const;
+
+		int getScale() const { return scale; }
+		int getWScale() const { return wScale; }
 	};
 }
