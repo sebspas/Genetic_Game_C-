@@ -3,6 +3,7 @@
 #include <string>
 #include <sstream>
 
+using namespace NeuralNetwork;
 
 void TrainingData::getTopology(std::vector<unsigned> &topology)
 {

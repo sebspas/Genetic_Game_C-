@@ -1,6 +1,8 @@
 #include "stdafx.h"
 #include "Neuron.h"
 
+using namespace NeuralNetwork;
+
 double Neuron::eta = 0.15;
 double Neuron::alpha = 0.5;
 
@@ -26,7 +28,7 @@ void Neuron::feed_forward(const Layer& prev_layer)
 	// sum
 	for (unsigned n = 0; n < prev_layer.size(); ++n)
 	{
-		sum += prev_layer[n].get_output_value() * 
+		sum += prev_layer[n].get_output_value() *
 			prev_layer[n].output_weights[my_index].weight;
 	}
 

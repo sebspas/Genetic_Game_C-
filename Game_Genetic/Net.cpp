@@ -3,6 +3,8 @@
 #include <iostream>
 #include <cassert>
 
+using namespace NeuralNetwork;
+
 double Net::recent_average_smoothing_factor = 100.0; // Number of training samples to average over
 
 Net::Net(const std::vector<unsigned>& topology)
@@ -70,7 +72,7 @@ void Net::back_prop(const std::vector<double>& targets_values)
 
 	// average mesurement
 	recent_average_error = (recent_average_error * recent_average_smoothing_factor + error)
-	/ (recent_average_smoothing_factor + 1.0);
+		/ (recent_average_smoothing_factor + 1.0);
 
 	// Calculate output layer gradients
 
@@ -114,4 +116,3 @@ void Net::get_results(std::vector<double>& results_values) const
 		results_values.push_back(layers.back()[n].get_output_value());
 	}
 }
-
