@@ -156,6 +156,7 @@
     <ClInclude Include="Renderer.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="SnakeGame.h" />
+    <ClInclude Include="SnakeRecorder.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />
     <ClInclude Include="TrainingData.h" />
@@ -167,6 +168,7 @@
     <ClCompile Include="PlayerSnake.cpp" />
     <ClCompile Include="Renderer.cpp" />
     <ClCompile Include="SnakeGame.cpp" />
+    <ClCompile Include="SnakeRecorder.cpp" />
     <ClCompile Include="Snake_main.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>

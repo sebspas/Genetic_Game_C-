@@ -2,15 +2,20 @@
 #include "stdafx.h"
 #include <iostream>
 #include <vector>
-#include <string>
 #include <ctime>
 
 #include <SDL.h> //Main SDL library
 #include <SDL_ttf.h> //Optional SDL library used to display text using renderers
 #include "SnakeGame.h"
 #include "PlayerSnake.h"
+#include "Net.h"
 
+/*
 int main(int argc, char* argv[]) {
+	SDL_Event event;
+
+	// activate or not the neural network
+	bool NeuralNetwork_Playing = true;
 
 	//Init everything so we have everything
 	SDL_Init(SDL_INIT_EVERYTHING);
@@ -26,7 +31,7 @@ int main(int argc, char* argv[]) {
 	int wScale = 24;
 
 	auto player_snake = new Snake::PlayerSnake();
-	auto snake_game = new Snake::SnakeGame(scale, wScale);
+	auto snake_game = new Snake::SnakeGame(scale, wScale, !NeuralNetwork_Playing, NeuralNetwork_Playing);
 
 	while (true) { //Main game loop, this constantly runs and keeps everything updated
 		snake_game->update();
@@ -34,3 +39,4 @@ int main(int argc, char* argv[]) {
 
 	return 0;
 }
+*/

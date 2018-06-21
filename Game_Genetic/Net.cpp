@@ -2,13 +2,29 @@
 #include "Net.h"
 #include <iostream>
 #include <cassert>
+#include <string>
+#include "TrainingData.h"
 
 using namespace NeuralNetwork;
 
 double Net::recent_average_smoothing_factor = 100.0; // Number of training samples to average over
 
+void show_vector_vals(const std::string label, std::vector<double> &v)
+{
+	std::cout << label << " ";
+	for (unsigned i = 0; i < v.size(); ++i) {
+		std::cout << v[i] << " ";
+	}
+
+	std::cout << std::endl;
+}
+
 Net::Net(const std::vector<unsigned>& topology)
 {
+	error = 0.0;
+	recent_average_error = 0.0;
+	net_topology = topology;
+
 	const auto num_layers = topology.size();
 
 	for (unsigned layer_num = 0; layer_num < num_layers; ++layer_num)
@@ -115,4 +131,39 @@ void Net::get_results(std::vector<double>& results_values) const
 	{
 		results_values.push_back(layers.back()[n].get_output_value());
 	}
+}
+
+void Net::trainNetwork(TrainingData* train_data)
+{
+	std::vector<double> input_vals, target_vals, result_vals;
+	auto training_pass = 0;
+
+	while (!train_data->isEof()) {
+		++training_pass;
+		std::cout << std::endl << "Pass " << training_pass;
+
+		// Get new input data and feed it forward:
+		if (train_data->get_next_inputs(input_vals) != net_topology[0]) {
+			break;
+		}
+
+		show_vector_vals(": Inputs:", input_vals);
+		feed_forward(input_vals);
+
+		// Collect the net's actual output results:
+		get_results(result_vals);
+		show_vector_vals("Outputs:", result_vals);
+
+		// Train the net what the outputs should have been:
+		train_data->get_target_outputs(target_vals);
+		show_vector_vals("Targets:", target_vals);
+		assert(target_vals.size() == net_topology.back());
+
+		back_prop(target_vals);
+
+		// Report how well the training is working, average over recent samples:
+		std::cout << "Net recent average error: " << get_recent_average_error() << std::endl;
+	}
+
+	std::cout << std::endl << "Training over!" << std::endl;
 }

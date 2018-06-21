@@ -39,12 +39,6 @@
     <ClInclude Include="Neuron.h">
       <Filter>Header Files\NeuralNetwork</Filter>
     </ClInclude>
-    <ClInclude Include="resource.h">
-      <Filter>Header Files\NeuralNetwork</Filter>
-    </ClInclude>
-    <ClInclude Include="TrainingData.h">
-      <Filter>Header Files\NeuralNetwork</Filter>
-    </ClInclude>
     <ClInclude Include="Renderer.h">
       <Filter>Header Files\Snake</Filter>
     </ClInclude>
@@ -53,6 +47,15 @@
     </ClInclude>
     <ClInclude Include="PlayerSnake.h">
       <Filter>Header Files\Snake</Filter>
+    </ClInclude>
+    <ClInclude Include="SnakeRecorder.h">
+      <Filter>Header Files\Snake</Filter>
+    </ClInclude>
+    <ClInclude Include="resource.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="TrainingData.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -81,6 +84,9 @@
       <Filter>Source Files\NeuralNetwork</Filter>
     </ClCompile>
     <ClCompile Include="PlayerSnake.cpp">
+      <Filter>Source Files\Snake</Filter>
+    </ClCompile>
+    <ClCompile Include="SnakeRecorder.cpp">
       <Filter>Source Files\Snake</Filter>
     </ClCompile>
   </ItemGroup>

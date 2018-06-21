@@ -1,9 +1,9 @@
-#include "stdafx.h"
+﻿#include "stdafx.h"
 #include "Neuron.h"
 
 using namespace NeuralNetwork;
 
-double Neuron::eta = 0.15;
+double Neuron::eta = 0.10;
 double Neuron::alpha = 0.5;
 
 Neuron::Neuron(const unsigned nb_output, const unsigned index)
@@ -12,6 +12,7 @@ Neuron::Neuron(const unsigned nb_output, const unsigned index)
 	{
 		output_weights.push_back(Connection());
 		output_weights.back().weight = random_weight();
+		output_weights.back().delta_weight = 0;
 	}
 
 	my_index = index;
@@ -37,7 +38,7 @@ void Neuron::feed_forward(const Layer& prev_layer)
 
 void Neuron::calculate_output_gradient(const double targets_value)
 {
-	const auto delta = targets_value - output_value;
+	const double delta = targets_value - output_value;
 	gradient = delta * Neuron::transfer_function_derivative(output_value);
 }
 
@@ -55,7 +56,7 @@ double Neuron::sum_oow(const Layer& next_layer) const
 
 void Neuron::calculate_hidden_gradient(const Layer& next_layer)
 {
-	const auto dow = sum_oow(next_layer);
+	const double dow = sum_oow(next_layer);
 	gradient = dow * Neuron::transfer_function_derivative(output_value);
 }
 
@@ -64,8 +65,13 @@ void Neuron::update_input_weight(Layer& prev_layer)
 	for (unsigned n = 0; n < prev_layer.size(); ++n)
 	{
 		Neuron &neuron = prev_layer[n];
-		auto old_delta_weight = neuron.output_weights[my_index].delta_weight;
-		auto new_delta_weight = eta * neuron.output_value * gradient + alpha * old_delta_weight;
+		double old_delta_weight = neuron.output_weights[my_index].delta_weight;
+		double new_delta_weight = 
+			eta 
+			* neuron.get_output_value() 
+			* gradient 
+			+ alpha 
+			* old_delta_weight;
 
 		neuron.output_weights[my_index].delta_weight = new_delta_weight;
 		neuron.output_weights[my_index].weight += new_delta_weight;
@@ -82,6 +88,6 @@ double Neuron::transfer_function(const double x)
 double Neuron::transfer_function_derivative(const double x)
 {
 	// derivative of tanh
-	// 1 - x�
+	// 1 - x²
 	return 1.0 - x * x;
 }

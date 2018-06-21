@@ -82,5 +82,6 @@ bool PlayerSnake::collisionWithPlayerTail(int objX, int objY)
 			return true;
 		}
 	}
-		return false;
+
+	return false;
 }
