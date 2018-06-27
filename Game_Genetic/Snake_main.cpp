@@ -10,7 +10,7 @@
 #include "PlayerSnake.h"
 #include "Net.h"
 
-/*
+
 int main(int argc, char* argv[]) {
 	SDL_Event event;
 
@@ -39,4 +39,3 @@ int main(int argc, char* argv[]) {
 
 	return 0;
 }
-*/

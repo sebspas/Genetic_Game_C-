@@ -12,10 +12,10 @@ public:
 
 	/**
 	 * Obj : 
-	 *	-1 wall or tail
 	 *	 0 nothing
-	 *	 1 food
+	 *	 1 wall or tail
+	 *	 2 food
 	 * Output : direction see SnakeGame.h
 	 */
-	void writeData(int obj_left, int obj_right, int obj_front, int output);
+	void writeData(int obj_left, int obj_front, int obj_right, int deltaFoodX, int deltaFoodY, int output);
 };

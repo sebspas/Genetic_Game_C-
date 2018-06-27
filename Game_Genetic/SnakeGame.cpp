@@ -3,6 +3,7 @@
 #include <ctime>
 #include <SDL_ttf.h>
 #include <iostream>
+#include <algorithm>
 
 using namespace Snake;
 
@@ -47,31 +48,18 @@ void SnakeGame::getPlayerInputs()
 		}
 		//If a key is pressed
 		if (event.type == SDL_KEYDOWN) {
-			started = true;
 			//Then check for the key being pressed and change direction accordingly
-			if (!down && event.key.keysym.scancode == SDL_SCANCODE_UP) {
-				up = true;
-				left = false;
-				right = false;
-				down = false;
+			if (playerSnake->getForward() != DOWN && event.key.keysym.scancode == SDL_SCANCODE_UP) {
+				playerSnake->setForward(UP);
 			}
-			else if (!right && event.key.keysym.scancode == SDL_SCANCODE_LEFT) {
-				up = false;
-				left = true;
-				right = false;
-				down = false;
+			else if (playerSnake->getForward() != RIGHT && event.key.keysym.scancode == SDL_SCANCODE_LEFT) {
+				playerSnake->setForward(LEFT);
 			}
-			else if (!up && event.key.keysym.scancode == SDL_SCANCODE_DOWN) {
-				up = false;
-				left = false;
-				right = false;
-				down = true;
+			else if (playerSnake->getForward() != UP && event.key.keysym.scancode == SDL_SCANCODE_DOWN) {
+				playerSnake->setForward(DOWN);
 			}
-			else if (!left && event.key.keysym.scancode == SDL_SCANCODE_RIGHT) {
-				up = false;
-				left = false;
-				right = true;
-				down = false;
+			else if (playerSnake->getForward() != LEFT && event.key.keysym.scancode == SDL_SCANCODE_RIGHT) {
+				playerSnake->setForward(RIGHT);
 			}
 		}
 	}
@@ -92,32 +80,33 @@ void SnakeGame::update()
 		getPlayerInputs();
 	}
 
-	if (record && started && delta*renderer->getScale() == 24)
+	if (record && delta*renderer->getScale() == 24)
 	{
-		int left_obj = checkTypeOfObject(playerSnake->getX() - 1, playerSnake->getY(), food.x, food.y, renderer->getScale(), renderer->getWScale());
-		int right_obj = checkTypeOfObject(playerSnake->getX() + 1, playerSnake->getY(), food.x, food.y, renderer->getScale(), renderer->getWScale());
-		int front_obj = checkTypeOfObject(playerSnake->getX(), playerSnake->getY() - 1, food.x, food.y, renderer->getScale(), renderer->getWScale());
+		
+		int deltaFoodX = 0, deltaFoodY = 0;
+		if (playerSnake->getX() - foodLoc.first > 0) deltaFoodX = 1;
+		if (playerSnake->getX() - foodLoc.first < 0) deltaFoodX = -1;
+		if (playerSnake->getY() - foodLoc.second > 0) deltaFoodY = 1;
+		if (playerSnake->getY() - foodLoc.second < 0) deltaFoodY = -1;
 
-		int		   output = UP;
-		if (right) output = RIGHT;
-		if (left)  output = LEFT;
-		if (down)  output = DOWN;
+
+		std::vector<double> caseRelativeToSnake = checkPosRelativeToSnake(playerSnake->getForward());
 
 		//Game over if player out of bounds, also reset everything
-		if (!playerSnake->collisionWithPlayerTail(playerSnake->getX(), playerSnake->getY())
-			&& !outOfBounds(playerSnake->getX(), playerSnake->getY(), renderer->getScale(), renderer->getWScale()))
+		if (!outOfBounds(playerSnake->getX(), playerSnake->getY(), renderer->getScale(), renderer->getWScale()))
 		{
 			snake_recorder->writeData(
-				left_obj,
-				front_obj,
-				right_obj,
-//				(playerSnake->getX() - foodLoc.first) / renderer->getScale(),
-				//(playerSnake->getY() - foodLoc.second) / renderer->getScale(),
-				output);
+				caseRelativeToSnake[0], // LEFT to the snake
+				caseRelativeToSnake[1], // Forward to the snake
+				caseRelativeToSnake[2], // Right to the snake
+				deltaFoodX,
+				deltaFoodY,
+				worldToSnake(playerSnake->getPrevDir(), playerSnake->getForward())
+			);
 		}
 	}
 		
-	playerSnake->update(up,left,right,down, delta, renderer->getScale());
+	playerSnake->update(playerSnake->getForward(), delta, renderer->getScale());
 
 	//Collision detection, has played collided with food?
 	if (checkCollision(food.x, food.y, playerSnake->getX(), playerSnake->getY())) {
@@ -137,12 +126,7 @@ void SnakeGame::update()
 	{
 		renderer->gameOver(event, playerSnake->getTailLength());
 		playerSnake->resetPlayer();
-		up = false;
-		left = false;
-		right = false;
-		down = false;
 		spawnFood();
-		started = false;
 	}
 
 	//Render everything
@@ -167,9 +151,9 @@ bool SnakeGame::outOfBounds(int x, int y, int scale, int wScale)
 int SnakeGame::checkTypeOfObject(int x, int y, int foodx, int foody, int scale, int wScale)
 {
 	if (foodx == x && foody == y)
-		return 1; // food
+		return 2; // food
 	if (outOfBounds(x, y, scale, wScale))
-		return -1; // wall
+		return 1; // wall
 
 	return 0; // nothing
 }
@@ -196,6 +180,185 @@ std::pair<int, int> SnakeGame::getFoodSpawn(const PlayerSnake* player_snake) con
 	return std::make_pair(x, y);
 }
 
+std::vector<double> SnakeGame::checkPosRelativeToSnake(const Directions forward) const
+{
+	int relLeftPosX = 0, relLeftPosY = 0, relRightPosX = 0, relRightPosY = 0, relForwardPosX = 0, relForwardPosY = 0;
+
+	switch (forward)
+	{
+		case RIGHT:
+			relLeftPosX = playerSnake->getX();
+			relLeftPosY = playerSnake->getY()-1;
+			relRightPosX = playerSnake->getX();
+			relRightPosY = playerSnake->getY()+1;
+			relForwardPosX = playerSnake->getX()+1;
+			relForwardPosY = playerSnake->getY();
+			break;
+		case LEFT:
+			relLeftPosX = playerSnake->getX();
+			relLeftPosY = playerSnake->getY()+1;
+			relRightPosX = playerSnake->getX();
+			relRightPosY = playerSnake->getY()-1;
+			relForwardPosX = playerSnake->getX()-1;
+			relForwardPosY = playerSnake->getY();
+			break;
+		case UP:
+			relLeftPosX = playerSnake->getX()-1;
+			relLeftPosY = playerSnake->getY();
+			relRightPosX = playerSnake->getX()+1;
+			relRightPosY = playerSnake->getY();
+			relForwardPosX = playerSnake->getX();
+			relForwardPosY = playerSnake->getY()-1;
+			break;
+		case DOWN:
+			relLeftPosX = playerSnake->getX()+1;
+			relLeftPosY = playerSnake->getY();
+			relRightPosX = playerSnake->getX()-1;
+			relRightPosY = playerSnake->getY();
+			relForwardPosX = playerSnake->getX();
+			relForwardPosY = playerSnake->getY()+1;
+			break;
+	}
+
+	auto result = std::vector<double>();
+
+	result.push_back(checkTypeOfObject(relLeftPosX, relLeftPosY, food.x, food.y, renderer->getScale(), renderer->getWScale()));
+	result.push_back(checkTypeOfObject(relForwardPosX, relForwardPosY, food.x, food.y, renderer->getScale(), renderer->getWScale()));
+	result.push_back(checkTypeOfObject(relRightPosX, relRightPosY, food.x, food.y, renderer->getScale(), renderer->getWScale()));
+
+	return result;
+}
+
+Directions SnakeGame::snakeToWorld(const Directions outputNeural) const
+{
+	Directions ret = NONE;
+	switch (playerSnake->getForward())
+	{
+	case RIGHT:
+		if (outputNeural == 0)
+		{
+			ret = UP;
+		} else if (outputNeural == 1)
+		{
+			ret = RIGHT;
+		} else if (outputNeural == 2)
+		{
+			ret = DOWN;
+		}
+		break;
+	case LEFT:
+		if (outputNeural == 0)
+		{
+			ret = DOWN;
+		}
+		else if (outputNeural == 1)
+		{
+			ret = LEFT;
+		}
+		else if (outputNeural == 2)
+		{
+			ret = UP;
+		}
+		break;
+	case UP:
+		if (outputNeural == 0)
+		{
+			ret = LEFT;
+		}
+		else if (outputNeural == 1)
+		{
+			ret = UP;
+		}
+		else if (outputNeural == 2)
+		{
+			ret = RIGHT;
+		}
+		break;
+	case DOWN:
+		if (outputNeural == 0)
+		{
+			ret = RIGHT;
+		}
+		else if (outputNeural == 1)
+		{
+			ret = DOWN;
+		}
+		else if (outputNeural == 2)
+		{
+			ret = LEFT;
+		}
+		break;
+	}
+
+	return ret;
+}
+
+Directions SnakeGame::worldToSnake(const Directions oldSnake, const Directions NewSnake) const
+{
+	Directions ret = NONE;
+	switch (oldSnake)
+	{
+	case RIGHT:
+		if (NewSnake == UP)
+		{
+			ret = LEFT;
+		}
+		else if (NewSnake == RIGHT)
+		{
+			ret = UP;
+		}
+		else if (NewSnake == DOWN)
+		{
+			ret = RIGHT;
+		}
+		break;
+	case LEFT:
+		if (NewSnake == DOWN)
+		{
+			ret = LEFT;
+		}
+		else if (NewSnake == LEFT)
+		{
+			ret = UP;
+		}
+		else if (NewSnake == UP)
+		{
+			ret = RIGHT;
+		}
+		break;
+	case UP:
+		if (NewSnake == LEFT)
+		{
+			ret = LEFT;
+		}
+		else if (NewSnake == UP)
+		{
+			ret = UP;
+		}
+		else if (NewSnake == RIGHT)
+		{
+			ret = RIGHT;
+		}
+		break;
+	case DOWN:
+		if (NewSnake == RIGHT)
+		{
+			ret = LEFT;
+		}
+		else if (NewSnake == DOWN)
+		{
+			ret = UP;
+		}
+		else if (NewSnake == LEFT)
+		{
+			ret = RIGHT;
+		}
+		break;
+	}
+
+	return ret;
+}
+
 void SnakeGame::enableNeuralNetwork()
 {
 	NeuralNetwork::TrainingData train_data("training_data_snake.txt");
@@ -219,72 +382,43 @@ void SnakeGame::getInputFromNeuralNetwork()
 		{
 			renderer->gameOver(event, playerSnake->getTailLength());
 			playerSnake->resetPlayer();
-			up = false;
-			left = false;
-			right = false;
-			down = false;
 			spawnFood();
-			started = false;
 		}
 	}
 
-	int left_obj  = checkTypeOfObject(playerSnake->getX() - 1, playerSnake->getY(), food.x, food.y, renderer->getScale(), renderer->getWScale());
-	int right_obj = checkTypeOfObject(playerSnake->getX() + 1, playerSnake->getY(), food.x, food.y, renderer->getScale(), renderer->getWScale());
-	int front_obj = checkTypeOfObject(playerSnake->getX(), playerSnake->getY() - 1, food.x, food.y, renderer->getScale(), renderer->getWScale());
-//	int deltaFoodPlayerX = (playerSnake->getX() - foodLoc.first) /renderer->getScale();
-//	int deltaFoodPlayerY = (playerSnake->getY() - foodLoc.second) / renderer->getScale();
-
-	std::vector<double> inputs;
-	inputs.push_back(left_obj);
-	inputs.push_back(front_obj);
-	inputs.push_back(right_obj);
-//	inputs.push_back(deltaFoodPlayerX);
-//	inputs.push_back(deltaFoodPlayerY);
-
+	std::vector<double> caseRelativeToSnake = checkPosRelativeToSnake(playerSnake->getForward());
+	int deltaFoodX = 0, deltaFoodY = 0;
+	if (playerSnake->getX() - foodLoc.first > 0) deltaFoodX = 1;
+	if (playerSnake->getX() - foodLoc.first < 0) deltaFoodX = -1;
+	if (playerSnake->getY() - foodLoc.second > 0) deltaFoodY = 1;
+	if (playerSnake->getY() - foodLoc.second < 0) deltaFoodY = -1;
+	caseRelativeToSnake.push_back(deltaFoodX);
+	caseRelativeToSnake.push_back(deltaFoodY);
 	std::vector<double> outputs;
 
-	neural_network->feed_forward(inputs);
+	neural_network->feed_forward(caseRelativeToSnake);
 	neural_network->get_results(outputs);
 
-	for (unsigned i = 0; i < inputs.size(); ++i) {
-		std::cout << inputs[i] << " ";
+	for (unsigned i = 0; i < caseRelativeToSnake.size(); ++i) {
+		std::cout << caseRelativeToSnake[i] << " ";
 	}
 	std::cout << std::endl;
 	for (unsigned i = 0; i < outputs.size(); ++i) {
 		std::cout << outputs[i] << " ";
 	}
-	while(true) {}
+	std::cout << std::endl;
 
-	/*std::cout << "Before round : " << outputs[0] << std::endl;
-	int output = round(outputs[0]);
-	
-	std::cout << "After round : " << output << std::endl;
+	double max_val = outputs[0];
+	int output = 0;
+	for (int i = 0; i < outputs.size(); ++i)
+	{
+		if (outputs[i] > max_val) {
+			output = i;
+			max_val = outputs[i];
+		}
+	}
 
-	if (output == RIGHT)
-	{
-		std::cout << "right" << std::endl;
-		// right
-		right = true;
-		left = down = up = false;
-	} else if (output == DOWN)
-	{
-		std::cout << "down" << std::endl;
-		// down
-		down = true;
-		left = right = up = false;
-	} else if (output == LEFT)
-	{
-		std::cout << "left" << std::endl;
-		// left
-		left = true;
-		down = right = up = false;
-	} else if (output == UP)
-	{
-		std::cout << "up" << std::endl;
-		// up
-		up = true;
-		down = right = left = false;
-	}*/
+	playerSnake->setForward(snakeToWorld((Directions)output));
 }
 
 void SnakeGame::spawnFood()

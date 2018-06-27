@@ -25,14 +25,11 @@
     <Filter Include="Source Files\Snake">
       <UniqueIdentifier>{5f28c70a-62c0-48c2-9a1d-9a4b9f583b17}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\VisualFiles">
+      <UniqueIdentifier>{a631dd00-01fc-4348-8350-40c0210ec47f}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="stdafx.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="targetver.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Net.h">
       <Filter>Header Files\NeuralNetwork</Filter>
     </ClInclude>
@@ -48,14 +45,20 @@
     <ClInclude Include="PlayerSnake.h">
       <Filter>Header Files\Snake</Filter>
     </ClInclude>
+    <ClInclude Include="resource.h">
+      <Filter>Header Files\VisualFiles</Filter>
+    </ClInclude>
+    <ClInclude Include="stdafx.h">
+      <Filter>Header Files\VisualFiles</Filter>
+    </ClInclude>
+    <ClInclude Include="targetver.h">
+      <Filter>Header Files\VisualFiles</Filter>
+    </ClInclude>
     <ClInclude Include="SnakeRecorder.h">
       <Filter>Header Files\Snake</Filter>
     </ClInclude>
-    <ClInclude Include="resource.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="TrainingData.h">
-      <Filter>Header Files</Filter>
+      <Filter>Header Files\NeuralNetwork</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -6,14 +6,6 @@
 
 namespace Snake {
 
-	enum Directions
-	{
-		LEFT,
-		UP,
-		RIGHT,
-		DOWN
-	};
-
 	class SnakeGame
 	{
 		PlayerSnake* playerSnake;
@@ -25,14 +17,7 @@ namespace Snake {
 
 		float time;
 
-		//Booleans to control the movement
-		bool up = false;
-		bool down = false;
-		bool right = false;
-		bool left = false;
-
 		bool record = false;
-		bool started = false;
 		SnakeRecorder* snake_recorder;
 
 		bool AIPlaying = false;
@@ -51,6 +36,10 @@ namespace Snake {
 
 		std::pair <int, int> getFoodSpawn(const PlayerSnake* player_snake) const;
 
+		std::vector<double> checkPosRelativeToSnake(const Directions forward) const;
+
+		Directions snakeToWorld(const Directions outputNeural) const;
+		Directions worldToSnake(const Directions oldSnake, const Directions NewSnake) const;
 		
 	private:
 		void spawnFood();

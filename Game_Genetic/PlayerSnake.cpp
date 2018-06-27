@@ -6,6 +6,7 @@ using namespace Snake;
 PlayerSnake::PlayerSnake()
 {
 	x = y = prevX = prevY = tailLength = 0;
+	forward = DOWN;
 }
 
 
@@ -20,9 +21,10 @@ void PlayerSnake::resetPlayer()
 	tailX.clear();
 	tailY.clear();
 	tailLength = 0;
+	forward = DOWN;
 }
 
-void PlayerSnake::update(bool up, bool left, bool right, bool down, float deltaTime, int scale)
+void PlayerSnake::update(Directions forward, float deltaTime, int scale)
 {
 	//The previous position of the player block, these are used so tail blocks will never be on the player block's position
 	prevX = x;
@@ -31,16 +33,16 @@ void PlayerSnake::update(bool up, bool left, bool right, bool down, float deltaT
 	//delta*xMovementPerTick
 	//This makes the player move at the same speed regardless of framerate
 	//Without this the player would move way too fast
-	if (up) {
+	if (forward == UP) {
 		y -= deltaTime * scale;
 	}
-	else if (left) {
+	else if (forward == LEFT) {
 		x -= deltaTime * scale;		
 	}
-	else if (right) {
+	else if (forward == RIGHT) {
 		x += deltaTime * scale;
 	}
-	else if (down) {
+	else if (forward == DOWN) {
 		y += deltaTime * scale;
 	}
 }

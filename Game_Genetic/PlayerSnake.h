@@ -1,9 +1,17 @@
 #pragma once
-#include <SDL.h>
 #include <vector>
 
 namespace Snake
 {
+	enum Directions
+	{
+		LEFT,
+		UP,
+		RIGHT,
+		DOWN,
+		NONE
+	};
+
 	class PlayerSnake
 	{
 		int x, y;
@@ -12,6 +20,9 @@ namespace Snake
 
 		std::vector<int> tailX;
 		std::vector<int> tailY;
+
+		Directions forward;
+		Directions prevDir;
 
 	public:
 		PlayerSnake();
@@ -32,12 +43,23 @@ namespace Snake
 		int getTailXAt(int i) const { return tailX[i]; }
 		int getTailYAt(int i) const { return tailY[i]; }
 
+		void setForward(const Directions dir)
+		{
+			this->prevDir = this->forward;
+			this->forward = dir;
+		}
+		Directions getForward() const { return this->forward; }
+
+		void setPrevDir(const Directions dir) { this->prevDir = dir; }
+		Directions getPrevDir() const { return this->prevDir; }
+
 		void resetPlayer();
 
-		void update(bool up, bool left, bool right, bool down, float deltaTime, int scale);
+		void update(Directions forward, float deltaTime, int scale);
 		void updateTail();
 
 		bool collisionWithPlayerTail(int objX, int objY);
+
 	};
 
 }

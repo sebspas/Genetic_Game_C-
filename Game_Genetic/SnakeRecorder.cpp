@@ -7,7 +7,7 @@
 SnakeRecorder::SnakeRecorder(std::string my_data_file)
 {	
 	myfile.open(my_data_file);
-	myfile << "topology: 3 4 4" << std::endl;
+	myfile << "topology: 5 10 3" << std::endl;
 }
 
 SnakeRecorder::~SnakeRecorder()
@@ -15,26 +15,23 @@ SnakeRecorder::~SnakeRecorder()
 	myfile.close();
 }
 
-void SnakeRecorder::writeData(int obj_left, int obj_right, int obj_up, int output)
+void SnakeRecorder::writeData(int obj_left, int obj_front, int obj_right, int deltaFoodX, int deltaFoodY, int forward)
 {
-	myfile << "in: " << obj_left << " " << obj_up << " " << obj_right << std::endl;
+	myfile << "in: " << obj_left << " " << obj_front << " " << obj_right << " " << deltaFoodX << " " << deltaFoodY << std::endl;
 
-	int outL, outUp, outR, outDown;
-	outR = outUp = outL = outDown = 0;
+	int outL, outForward, outR;
+	outR = outForward = outL = 0;
 
-	if (output == Snake::RIGHT)
+	if (forward == Snake::RIGHT)
 	{
 		outR = 1;
-	} else if (output == Snake::LEFT)
+	} else if (forward == Snake::LEFT)
 	{
 		outL = 1;
-	} else if (output == Snake::UP)
+	} else if (forward == Snake::UP)
 	{
-		outUp = 1;
-	} else if (output == Snake::DOWN)
-	{
-		outDown = 1;
+		outForward = 1;
 	}
 
-	myfile << "out: " << outL << " " << outUp << " " << outR << " " << outDown << std::endl;
+	myfile << "out: " << outL << " " << outForward << " " << outR << std::endl;
 }
